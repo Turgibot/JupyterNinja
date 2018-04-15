@@ -22,6 +22,8 @@
 
 import os
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+import numpy as np
 
 
 def plot_images_grid(images, img_shape, given_class, predicted_class=None):
@@ -63,3 +65,57 @@ def create_directory(dir_path):
         os.mkdir(dir_path)
     except OSError:
         pass
+
+
+def plot_example_errors(cls_pred, correct, data_test_images, data_test_classes):
+
+    # Negate the boolean array.
+    incorrect = (correct == False)
+
+    # Get the images from the test-set that have been
+    # incorrectly classified.
+    images = data_test_images[incorrect]
+
+    # Get the predicted classes for those images.
+    cls_pred = cls_pred[incorrect]
+
+    # Get the true classes for those images.
+    cls_true = data_test_classes[incorrect]
+
+    # Plot the first 9 images.
+    plot_images_grid(images=images[0:32],
+                     img_shape=(28, 28),
+                     given_class=cls_true[0:32],
+                     predicted_class=cls_pred[0:32])
+
+
+def plot_confusion_matrix(cls_pred , data_test_cls, num_classes):
+    # This is called from print_test_accuracy() below.
+
+    # cls_pred is an array of the predicted class-number for
+    # all images in the test-set.
+
+    # Get the true classifications for the test-set.
+    cls_true = data_test_cls
+
+    # Get the confusion matrix using sklearn.
+    cm = confusion_matrix(y_true=cls_true,
+                          y_pred=cls_pred)
+
+    # Print the confusion matrix as text.
+    print(cm)
+
+    # Plot the confusion matrix as an image.
+    plt.matshow(cm)
+
+    # Make various adjustments to the plot.
+    plt.colorbar()
+    tick_marks = np.arange(num_classes)
+    plt.xticks(tick_marks, range(num_classes))
+    plt.yticks(tick_marks, range(num_classes))
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+
+    # Ensure the plot is shown correctly with multiple plots
+    # in a single Notebook cell.
+    plt.show()
